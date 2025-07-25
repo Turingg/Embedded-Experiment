@@ -10,14 +10,12 @@ volatile uint8 game_running = 0;
 uint32 matrix[16] = {0};
 uint32 score = 0;
 uint32 key_scan_bit = 0;
-// 数码管显示编码
 const uint8 display_code[16] = 
 {
     0xFC, 0x60, 0xDA, 0xF2, 0x66, 0xB6, 0xBE, 0xE0,
     0xFE, 0xE6, 0xEE, 0x3E, 0x9C, 0x7A, 0x9E, 0x8E
 };
 
-// 移位寄存器控制引脚初始化
 void Led_Init() 
 {
     // 初始化SI引脚
@@ -36,7 +34,6 @@ void Led_Init()
     IO0DIR |= (1<<17);
 }
 
-// 发送半字节数据到移位寄存器
 void Send_HalfWord(uint8 pos, uint8 data) 
 {
     uint8 i;
@@ -104,7 +101,6 @@ void Beep_init(void)
 
 void gpio_init(void)
 {
-    // 设置 P0.17 ~ P0.20 为 GPIO
     PINSEL1 &= 0xFFFFFC03;
     IO0DIR |= (LATIC_SCK | LATIC_RCK | LATIC_SI_X | LATIC_SI_Y);
 }
@@ -185,7 +181,6 @@ void init_keyboard_gpio(void)
     IO0DIR &= ~(1 << 5);
 }
 
-//键盘发送函数，按下键盘时扫描对应键码的键盘
 void send_keyboard_word(uint32 data)
 {
     uint32 i;
@@ -217,7 +212,6 @@ uint32 read_direction(void)
     if (!(IO0PIN & (1 << 5)))
     {
     	uint32 pressed_key = key_scan_bit;
-        //有按键按下
         key_scan_bit = (key_scan_bit + 1) % 16;
         switch (pressed_key)
         {
@@ -235,7 +229,6 @@ uint32 read_direction(void)
     }
     else
     {
-        //无按键按下
         key_scan_bit = (key_scan_bit + 1) % 16;
         return 255;
     }
@@ -337,7 +330,6 @@ uint8 update_snake(void)
     return 1;
 }
 
-//渲染蛇和食物的位置，以及分数
 void render_snake(void)
 {
     uint32 i;
