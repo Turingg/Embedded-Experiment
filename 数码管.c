@@ -17,7 +17,7 @@ typedef unsigned int U32;
 U8 ii=0;
 U8 jj=0;
 U8 key_scan_bit = 0; 
-U8 display_buffer[8]; // ÏÔÊ¾»º³åÇø
+U8 display_buffer[8]; 
 
 const U8 code[LED]=
 {
@@ -67,13 +67,13 @@ void Init_key()
     PINSEL0 &= ~(1<<13);
     IO0DIR |= SI_KEY;
 
-    // P0.5 GPIOÊäÈë(0)¹¦ÄÜ£¬¼ì²â°´¼ü
+    // P0.5 GPIOè¾“å…¥(0)åŠŸèƒ½ï¼Œæ£€æµ‹æŒ‰é”®
     PINSEL0 &= ~(1<<10);
     PINSEL0 &= ~(1<<11);
     IO0DIR &= ~KEY_IN;
-    //ÖÃ0£¬ÉèÖÃÎªÊäÈë
+    //ç½®0ï¼Œè®¾ç½®ä¸ºè¾“å…¥
     //IO0DIR |= KEY_IN;
-    ////ÖÃ1£¬ÉèÖÃÎªÊä³ö
+    ////ç½®1ï¼Œè®¾ç½®ä¸ºè¾“å‡º
 }
 
 void delay(U32 num)
@@ -83,7 +83,6 @@ void delay(U32 num)
     {
         for(j=0; j<500; j++)
         {
-             //delay(1) ÑÓÊ±·Ç³£¶Ì£¬ÊÊºÏÉ¨Ãè
         }
     }
 }
@@ -91,64 +90,55 @@ void delay(U32 num)
 void Send_HalfWord(U8 select, U8 data)
 {
     U8 i;
-    // RCKÀ­µÍ£¬×¼±¸Êı¾İ
-    IO0CLR = RCK_BIT;//Ğ´ '1' ÇåÁã£¬Ğ´ '0' ÎŞĞ§
+    // RCKæ‹‰ä½ï¼Œå‡†å¤‡æ•°æ®
+    IO0CLR = RCK_BIT;
 
-    // µÍ°ËÎ»µÄÆ¬Ñ¡
+    // ä½å…«ä½çš„ç‰‡é€‰
     for(i=0; i<8; i++)
     {
         IO0CLR = SCK_BIT;
         if(select & (0x0001))
         {
-            // SIÎª1
+            // SIä¸º1
             IO0SET = SI_BIT;
         }
         else
         {
-            // SIÎª0
+            // SIä¸º0
             IO0CLR = SI_BIT;
         }
-        // SCKÀ­¸ß£¬´«ÊäÊı¾İ
+        // SCKæ‹‰é«˜ï¼Œä¼ è¾“æ•°æ®
         IO0SET = SCK_BIT;
-        // Êı¾İÓÒÒÆ
+        // æ•°æ®å³ç§»
         select = (select>>1);
         IO0CLR = SCK_BIT;
     }
-
-    // ¸ß°ËÎ»µÄ¶ÎÂë
     for(i=0; i<8; i++)
     {
         IO0CLR = SCK_BIT;
         if(data & (0x0001))
         {
-            // SIÎª1
             IO0SET = SI_BIT;
         }
         else
         {
-            // SIÎª0
             IO0CLR = SI_BIT;
         }
-        // SCKÀ­¸ß£¬´«ÊäÊı¾İ
         IO0SET = SCK_BIT;
-        // Êı¾İÓÒÒÆ
         data = (data>>1);
         IO0CLR = SCK_BIT;
     }
     
-    // RCKÀ­¸ß£¬Ëø´æ²¢Êä³öÊı¾İ
     IO0SET = RCK_BIT;
 }
 
-//¼üÅÌ·¢ËÍº¯Êı
+//é”®ç›˜å‘é€å‡½æ•°
 void SendKEY_Word(U16 data)
 {
     U8 i=0;
-    // RCKÀ­µÍ£¬×¼±¸Êı¾İ 
     IO0CLR = RCK_KEY;
     for(i=0; i<16; i++)
     {
-        // SCKÀ­µÍ£¬×¼±¸Êı¾İ
         IO0CLR = SCK_KEY;
         //if(data & 0x0001)
         if(data & 0x8000)
@@ -165,7 +155,6 @@ void SendKEY_Word(U16 data)
         
     }
     IO0CLR = SCK_KEY;
-    // RCKÀ­¸ß£¬Ëø´æ²¢Êä³öÊı¾İ
     IO0SET = RCK_KEY;
 }
 
@@ -173,7 +162,6 @@ U8 Scan_KEY(void)
 {
 
     U16 select_word; 
-    //µÍµçÆ½ÓĞĞ§
     select_word = 0xFFFF & (~(1 << key_scan_bit));
 
     SendKEY_Word(select_word);
